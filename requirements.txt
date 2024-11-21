@@ -8,3 +8,4 @@ holidays
 keras
 scikit-learn
 tensorflow
+kaleido

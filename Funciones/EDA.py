@@ -58,7 +58,7 @@ def graficar_serie_tiempo(df, contaminante, columnas_resaltadas):
     )
 
     # Mostrar la gráfica
-    fig.show()
+    fig.write_html("index.html")
 
 def Periodograma(ts, detrend='linear', window='boxcar', scaling='density', ts_frequency=None, show_minor_ticks=True, axsize=(12, 3)):
     """
