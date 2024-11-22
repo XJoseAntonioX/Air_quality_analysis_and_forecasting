@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.signal import periodogram
 from statsmodels.tsa.seasonal import seasonal_decompose
+from statsmodels.tsa.stattools import adfuller, kpss 
+
+# Seasonality and time series graphics
 
 def graficar_serie_tiempo(df, contaminante, columnas_resaltadas):
     """
@@ -58,7 +61,7 @@ def graficar_serie_tiempo(df, contaminante, columnas_resaltadas):
     )
 
     # Mostrar la gráfica
-    fig.show(renderer="svg")
+    fig.show()
 
 def Periodograma(ts, detrend='linear', window='boxcar', scaling='density', ts_frequency=None, show_minor_ticks=True, axsize=(12, 3)):
     """
@@ -144,11 +147,26 @@ def Periodograma(ts, detrend='linear', window='boxcar', scaling='density', ts_fr
 
     return filtered_periods_spectra
 
-def Top_10_Periodogram(df, list_periods_spectra):
+def Top_10_Periodogram(df, column_name, list_periods_spectra):
+    """
+    Muestra los 10 principales periodos y sus espectros para la columna especificada del DataFrame.
+    
+    Parámetros:
+        df (pd.DataFrame): El DataFrame con los datos.
+        column_name (str): El nombre de la columna a analizar.
+        list_periods_spectra (list): Lista de tuplas con periodos y espectros correspondientes.
+    """
+    # Verificar si la columna existe en el DataFrame
+    if column_name not in df.columns:
+        raise ValueError(f"La columna '{column_name}' no se encuentra en el DataFrame proporcionado.")
 
-    # Nombres de las columnas (DataFrame)
-    columns = df.columns
+    # Extraer la columna como un pandas Series
+    series = df[column_name]
+    
+    # Nombre de la columna (variable)
+    variable_name = series.name if series.name is not None else column_name
 
+    # Iterar sobre la lista de periodos y espectros
     for i, (periods, spectrum) in enumerate(list_periods_spectra):
         # Ordenar espectros en orden descendente y tomar los top 10
         top_indices = np.argsort(spectrum)[-10:][::-1]
@@ -156,10 +174,119 @@ def Top_10_Periodogram(df, list_periods_spectra):
         top_spectra = spectrum[top_indices]
         
         # Crear DataFrame para la serie actual
-        df = pd.DataFrame({
+        df_top = pd.DataFrame({
             "top_periods": top_periods,
             "top_spectra": top_spectra
         }).sort_values(by="top_spectra", ascending=False)
+
+        # Mostrar el nombre de la variable
+        print(f"\nTop 10 para la variable '{variable_name}':")
+        display(df_top)
+
+# Correlations
+
+def heat(df, variable, lags_max):
+    """
+    Genera mapas de calor que muestran las correlaciones entre una variable específica
+    y las variables independientes con diferentes retrasos (lags),
+    utilizando los métodos Pearson, Spearman y Kendall.
+    
+    Parámetros:
+        data (pd.DataFrame): El DataFrame con los datos.
+        variable (str): La variable que no será transformada en lag.
+        lags_max (int): El número máximo de lags a considerar.
+    """
+
+    # Variables independientes
+    variables_independientes = list(df.columns)
+    variables_independientes.remove(variable)
+
+    # Configurar la figura para subplots
+    nrows = lags_max  # Una fila por cada lag
+    ncols = 3         # Tres columnas: Pearson, Spearman, Kendall
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(18, 4 * lags_max))
+    fig.suptitle(f"Correlaciones con '{variable}' por Lags y Métodos", fontsize=16, y=0.95)
+
+    # Iterar sobre cada lag y calcular correlaciones
+    for lag in range(1, lags_max + 1):
+        lagged_df = pd.DataFrame()
+
+        # Generar los lags para las variables independientes
+        for col in variables_independientes:
+            lagged_df[f"{col}_lag{lag}"] = df[col].shift(lag)
+
+        lagged_df[variable] = df[variable]
+
+        # Eliminar filas con valores NaN generados por los lags
+        lagged_df = lagged_df.dropna()
+
+        # Calcular las correlaciones para cada método
+        methods = ['pearson', 'spearman', 'kendall']
+        for col_idx, method in enumerate(methods):
+            corr_with_variable = lagged_df.corr(method=method)[[variable]].drop(index=variable)
+
+            # Graficar el mapa de calor
+            ax = axes[lag - 1, col_idx]
+            sns.heatmap(
+                corr_with_variable,
+                annot=True,
+                cmap='coolwarm',
+                fmt=".2f",
+                cbar=True,
+                vmin=-1,
+                vmax=1,
+                ax=ax
+            )
+            ax.set_title(f"Lag {lag} - {method.capitalize()} Correlation", fontsize=12)
+            ax.set_ylabel("Variables Idependientes" if col_idx == 0 else "")
+            ax.set_xlabel("Variable Dependiente" if lag == lags_max else "")
+            # Centrar el tick de la variable en el eje x
+            ax.set_xticks([0.5])  # Posición centrada
+            ax.set_xticklabels([variable])
+
+    plt.tight_layout(rect=[0, 0, 1, 0.94])
+    plt.show()
+
+# Stationarity Tests
+
+def prueba_adf(serie):
+    print("-- ADF a nivel --")
+    resultado = adfuller(serie, regression = "c")
+    print(f'Estadístico ADF: {resultado[0]}')
+    print(f'Valor p: {resultado[1]}')
+    print('Valores Críticos:')
+    if resultado[1] <= 0.05:
+        print("La serie SI es estacionaria a nivel (rechazamos la hipótesis nula).")
+    else:
+        print("La serie NO es estacionaria a nivel (no rechazamos la hipótesis nula).")
         
-        print(f"\nTop 10 para la variable '{columns[i]}':")
-        display(df)
+    print("\n-- ADF de tendencia --")
+    resultado = adfuller(serie, regression = "ct")
+    print(f'Estadístico ADF: {resultado[0]}')
+    print(f'Valor p: {resultado[1]}')
+    print('Valores Críticos:')
+    if resultado[1] <= 0.05:
+        print("La serie SI es estacionaria a nivel y tendencia (rechazamos la hipótesis nula).")
+    else:
+        print("La serie NO es estacionaria a nivel y tendencia (no rechazamos la hipótesis nula).")
+
+def prueba_kpss(serie):
+    print("-- KPSS a nivel --")
+    resultado = kpss(serie, regression = "c")
+    print(f'Estadístico KPSS: {resultado[0]}')
+    print(f'Valor p: {resultado[1]}')
+    print('Valores Críticos:')
+    if resultado[1] <= 0.05:
+        print("La serie NO es estacionaria a nivel (rechazamos la hipótesis nula).")
+    else:
+        print("La serie SI es estacionaria a nivel (no rechazamos la hipótesis nula).")
+    
+    print("\n-- KPSS de tendencia --")
+    resultado = kpss(serie, regression = "ct")
+    print(f'Estadístico KPSS: {resultado[0]}')
+    print(f'Valor p: {resultado[1]}')
+    print('Valores Críticos:')
+    if resultado[1] <= 0.05:
+        print("La serie NO es estacionaria a tendencia (rechazamos la hipótesis nula).")
+    else:
+        print("La serie SI es estacionaria a tendencia (no rechazamos la hipótesis nula).")
