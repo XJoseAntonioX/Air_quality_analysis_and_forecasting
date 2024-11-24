@@ -204,7 +204,8 @@ def time_series_lstm_cv(X_scaled, y_scaled, scaler_y, splits, test_size, validat
 
 def plot_mse_per_fold(mse_per_fold):
     """
-    Grafica el MSE de cada fold obtenido en los conjuntos de prueba (test).
+    Grafica el MSE de cada fold obtenido en los conjuntos de prueba (test),
+    incluyendo una línea horizontal para la media.
 
     Parámetros:
         mse_per_fold (list): Lista con los valores de MSE para cada fold.
@@ -212,15 +213,32 @@ def plot_mse_per_fold(mse_per_fold):
     Retorna:
         None. (Muestra la gráfica)
     """
+    # Calcular la media de los valores de MSE
+    mse_mean = np.mean(mse_per_fold)
+
     # Crear una gráfica de barras para los MSE de cada fold
     plt.figure(figsize=(8, 5))
-    plt.bar(range(1, len(mse_per_fold) + 1), mse_per_fold, color='skyblue', edgecolor='black')
+    plt.bar(range(1, len(mse_per_fold) + 1), mse_per_fold, color='skyblue', edgecolor='black', label='MSE por Fold')
+    
+    # Agregar una línea horizontal para la media
+    plt.axhline(y=mse_mean, color='red', linestyle='--', linewidth=2, label=f'Media MSE: {mse_mean:.2f}')
+    
+    # Etiquetas y título
     plt.xlabel('Fold')
     plt.ylabel('Mean Squared Error (MSE)')
     plt.title('MSE por Fold en los Conjuntos de Prueba')
     plt.xticks(range(1, len(mse_per_fold) + 1))
+    
+    # Agregar una cuadrícula
     plt.grid(axis='y', linestyle='--', alpha=0.7)
+    
+    # Agregar una leyenda
+    plt.legend()
+    
+    # Ajustar el diseño
     plt.tight_layout()
+
+    # Mostrar la gráfica
     plt.show()
 
 # Plot predictions of the model
