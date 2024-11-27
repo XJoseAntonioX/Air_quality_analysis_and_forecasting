@@ -8,3 +8,5 @@ holidays
 keras
 scikit-learn
 tensorflow
+geopandas
+folium
