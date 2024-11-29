@@ -45,7 +45,7 @@ def graficar_serie_tiempo(df, contaminante, columnas_resaltadas):
             y=puntos_resaltados[contaminante],
             name=col,
             mode='markers',
-            marker=dict(size=6, symbol='circle')
+            marker=dict(size=8, symbol='circle')
         ))
 
     # Configurar el rango deslizante y los botones de rango

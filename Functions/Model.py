@@ -279,7 +279,7 @@ def plot_time_series_with_predictions(historical_real_values, historical_predict
         y=df_historical['Valor Real'],
         name='Valor Real Histórico',
         mode='lines',
-        line=dict(color='blue')
+        line=dict(color='blue', width=3)
     ))
 
     # Agregar predicciones
@@ -288,7 +288,7 @@ def plot_time_series_with_predictions(historical_real_values, historical_predict
         y=df_historical['Predicciones'],
         name='Predicciones',
         mode='lines',
-        line=dict(color='red', dash='dash')
+        line=dict(color='red', dash='dash', width=3)
     ))
 
     # Agregar líneas verticales para los cortes
