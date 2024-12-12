@@ -9,8 +9,11 @@ The goal of this project is to develop a reliable predictive model capable of es
 ## Key Features
 
 **Data Preparation:** Rigorous preprocessing, including anomaly removal, imputation of missing values using K-Nearest Neighbors (KNN), and aggregation to daily resolution.
+
 **Feature Engineering:** Incorporation of additional variables such as holidays, weekends, and recurring temporal cycles derived from periodograms to enhance predictive power.
+
 **Exploratory Data Analysis: **Identification of trends, seasonality, and key correlations through visualization and statistical tests (KPSS and ADF) to validate data stationarity.
+
 **Model Implementation:** Deployment of an LSTM neural network, optimized for capturing short- and long-term dependencies in time-series data, with tailored architecture and hyperparameter settings.
 
 ## Why This Matters
