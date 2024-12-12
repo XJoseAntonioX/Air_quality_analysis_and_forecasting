@@ -1,4 +1,4 @@
-# Proyecto análisis y pronósticos de calidad del aire
+# Air Quality Prediction in Monterrey
 
 This repository contains the implementation and analysis of a predictive model aimed at addressing a critical environmental challenge: air pollution in Monterrey, Mexico. Using advanced data science techniques and historical data from January 2022 to July 2024, this project focuses on forecasting key air pollutants (PM10, SO2, CO, and NOX) to support informed decision-making and mitigate the adverse health effects associated with poor air quality.
 
