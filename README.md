@@ -49,6 +49,8 @@ Model predictions versus observed values, highlighting the model’s performance
 ### 🗺️ Spatial Distribution  
 Mapping predictions across different areas of the city.
 
+[PM10 Predictions](assets/Mapa_Prediccion_PM10.png)
+
 ## Why This Matters
 
 Air pollution in Monterrey is a pressing issue, primarily driven by industrial activity, vehicular emissions, and local meteorological conditions. This repository represents a step towards leveraging modern machine learning techniques to predict pollution levels, inform mitigation strategies, and protect vulnerable populations.
