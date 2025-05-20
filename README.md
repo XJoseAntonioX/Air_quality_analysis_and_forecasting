@@ -49,7 +49,7 @@ Model predictions versus observed values, highlighting the model’s performance
 ### 🗺️ Spatial Distribution  
 Mapping predictions across different areas of the city.
 
-[PM10 Predictions](assets/Mapa_Prediccion_PM10.png)
+[PM10 Mapa Predictions](assets/Mapa_Prediccion_PM10.png)
 
 ## Why This Matters
 
